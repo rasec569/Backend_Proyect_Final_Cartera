@@ -1,2 +1,2 @@
 # Backend_Proyect_Final_Cartera
- Proyecto final del bootcamp Full Stack app para el manejo de cartera  de una construcrota
+ Backend Proyecto final app para la gestión de la cartera  de una construcrota, del bootcamp Full Stack Talento Tech.
