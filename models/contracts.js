@@ -3,20 +3,21 @@ import mongoosePaginate from "mongoose-paginate-v2";
 
 const ContractSchema=Schema({
     cliente_id:{
-        type:int,
-        require:true
+        type:Schema.ObjectId,
+        ref:"Customer", 
+        required:true
     },
     propiedad_id:{
         type:int,
-        require:true,
+        required:true,
     },
     cuotas:{
         type:int,
-        require:true,
+        required:true,
     },
     total:{
         type:Double,
-        require:true,
+        required:true,
     }
 });
 

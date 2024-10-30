@@ -3,8 +3,9 @@ import mongoosePaginate from "mongoose-paginate-v2";
 
 const CustomerSchema=Schema({
     persona_id:{
-        type:int,
-        require:true,
+        type:ObjectId,
+        ref:"Customer", 
+        required:true,
     },
     dirección:{
         type:String,
