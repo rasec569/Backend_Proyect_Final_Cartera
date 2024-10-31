@@ -11,7 +11,9 @@ export const getCartera = async (req, res) => {
                     as: "persona_info"
                 }
             },
-            { $unwind: "$persona_info" },
+            {
+                $unwind: "$persona_info"
+            },
             {
                 $lookup: {
                     from: "contracts",
@@ -20,7 +22,9 @@ export const getCartera = async (req, res) => {
                     as: "contratos"
                 }
             },
-            { $unwind: "$contratos" },
+            {
+                $unwind: "$contratos"
+            },
             {
                 $lookup: {
                     from: "properties",
@@ -29,7 +33,9 @@ export const getCartera = async (req, res) => {
                     as: "propiedad_info"
                 }
             },
-            { $unwind: "$propiedad_info" },
+            {
+                $unwind: "$propiedad_info"
+            },
             {
                 $lookup: {
                     from: "payments",
@@ -71,7 +77,10 @@ export const getCartera = async (req, res) => {
                     total_pagado: "$total_pagado",
                     ultimo_pago: "$ultimo_pago",
                     saldo_pendiente: {
-                        $subtract: ["$total_contrato", "$total_pagado"]
+                        $subtract: [
+                            "$total_contrato",
+                            "$total_pagado"
+                        ]
                     }
                 }
             }
