@@ -1,21 +1,36 @@
 import { Schema,model } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 
-const UserSchema=Schema({
-    nickname:{
-        type:String,
-        require:true,
-        unique:true
+const PersonSchema =Schema({
+    tip_doc: { 
+        type: String, 
+        required: true 
     },
-    contraseña:{
-        type:String,
-        require:true,
+    doc_identifiacion: { 
+        type: String, 
+        required: true, 
+        unique: true 
+    },    
+    nombres: { 
+        type: String, 
+        required: true 
     },
-    rol:{
+    apellidos: { 
+        type: String, 
+        required: true 
+    },
+    email: { 
+        type: String 
+    },
+    telefono: { 
+        type: String,
+        require:true
+    },
+    dirección:{
         type:String,
-        require:true,
-    }
+        require:true
+    }   
 });
 
-UserSchema.plugin(mongoosePaginate);
-export default model("User",UserSchema,"users");
+PersonSchema.plugin(mongoosePaginate);
+export default model("Person",PersonSchema ,"people");

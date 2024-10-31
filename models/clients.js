@@ -2,15 +2,18 @@ import { Schema,model } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 
 const CustomerSchema=Schema({
-    persona_id:{
-        type:ObjectId,
-        ref:"Customer", 
-        required:true,
+    persona: { 
+        type: Schema.ObjectId, 
+        ref: "Person", 
+        required: true 
     },
-    dirección:{
-        type:String,
-        require:true
-    }    
+    conctacto:{
+        type: String
+    },
+    estado: { 
+        type: Boolean, 
+        required: true 
+    }     
 });
 
 CustomerSchema.plugin(mongoosePaginate);

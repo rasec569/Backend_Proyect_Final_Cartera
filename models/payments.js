@@ -2,19 +2,19 @@ import { Schema,model } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 
 const PaymentSchema=Schema({
-    contrato_id:{
-        type:int,
-        require:true
+    contrato: { 
+        type: Schema.ObjectId, 
+        ref: "Contract", 
+        required: true },
+    fecha_pago: { 
+        type: Date, 
+        required: true 
     },
-    monto:{
-        type:Double,
-        require:true,
+    monto: { 
+        type: Number, 
+        required: true 
     },
-    fecha:{
-        type:Date,
-        require:true,
-    }
 });
 
-UserSchema.plugin(mongoosePaginate);
+PaymentSchema.plugin(mongoosePaginate);
 export default model("Payment",PaymentSchema,"payments");

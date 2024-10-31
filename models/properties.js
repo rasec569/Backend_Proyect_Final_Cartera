@@ -2,6 +2,10 @@ import { Schema,model } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 
 const PropertySchema=Schema({
+    proyecto: { 
+        type: Schema.ObjectId, 
+        ref: "Project", 
+        required: true },
     tipo:{
         type:String,
         require:true
@@ -10,10 +14,9 @@ const PropertySchema=Schema({
         type:Double,
         require:true
     },
-    proyecto_id:{
-        type:int,
-        require:true
-    }
+    descripcion: { 
+        type: String 
+    },
 });
 PropertySchema.plugin(mongoosePaginate);
 export default model("Property", PropertySchema,"properties");

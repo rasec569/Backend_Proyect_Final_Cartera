@@ -2,24 +2,33 @@ import { Schema,model } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 
 const ContractSchema=Schema({
-    cliente_id:{
-        type:Schema.ObjectId,
-        ref:"Customer", 
-        required:true
+    cliente: { 
+        type: Schema.ObjectId, 
+        ref: "Client", 
+        required: true 
     },
-    propiedad_id:{
-        type:int,
-        required:true,
+    propiedad: { 
+        type: Schema.ObjectId, 
+        ref: "Property", 
+        required: true 
     },
-    cuotas:{
-        type:int,
-        required:true,
+    fecha_contrato: { 
+        type: Date, 
+        required: true 
+    },
+    numero_cuotas: { 
+        type: Number, 
+        required: true 
+    },
+    monto_cuota: { 
+        type: Number, 
+        required: true 
     },
     total:{
-        type:Double,
+        type:Number,
         required:true,
-    }
+    },
 });
 
-UserSchema.plugin(mongoosePaginate);
+ContractSchema.plugin(mongoosePaginate);
 export default model("Contract",ContractSchema,"contracts");
