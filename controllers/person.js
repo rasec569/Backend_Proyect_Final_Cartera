@@ -1,5 +1,4 @@
 import Person from "../models/people.js";
-import Client from "../models/clients.js";
 
 // Crear persona
 export const createPerson = async (req, res) => {

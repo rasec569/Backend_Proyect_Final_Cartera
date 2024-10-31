@@ -10,6 +10,7 @@ import PersonRoutes from "./routes/people.js";
 import ProjectRoutes from "./routes/projects.js";
 import PropertyRoutes from "./routes/properties.js";
 import UserRoutes from "./routes/users.js";
+import carteraRoutes from "./routes/cartera.js";
 
 // mensaje de Bienvenida 
 console.log("API Node en ejecucion");
@@ -41,6 +42,7 @@ app.use('/api/people', PersonRoutes);
 app.use('/api/projects', ProjectRoutes);
 app.use('/api/properties', PropertyRoutes);
 app.use('/api/user', UserRoutes);
+app.use("/api/cartera", carteraRoutes);
 
 // Configurar ek servidor de Node
 app.listen(puerto, ()=>{
