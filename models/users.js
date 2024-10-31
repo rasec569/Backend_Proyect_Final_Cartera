@@ -1,7 +1,7 @@
 import { Schema,model } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 
-const UserSchema=Schema({
+const UserSchema=new Schema({
     persona: { 
         type: Schema.ObjectId, 
         ref: "Person", 
@@ -28,3 +28,4 @@ const UserSchema=Schema({
 
 UserSchema.plugin(mongoosePaginate);
 export default model("User",UserSchema,"users");
+export { UserSchema };

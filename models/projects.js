@@ -1,7 +1,7 @@
 import { Schema,model } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 
-const ProyectSchema=Schema({
+const ProyectSchema=new Schema({
     nombre:{
         type:String,
         require:true,
@@ -24,4 +24,5 @@ const ProyectSchema=Schema({
     }
 });
 ProyectSchema.plugin(mongoosePaginate);
-export default model("Proyect", ProyectSchema, "proyects")
+export default model("Proyect", ProyectSchema, "proyects");
+export { ProyectSchema };

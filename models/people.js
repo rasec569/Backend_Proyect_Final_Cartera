@@ -1,7 +1,7 @@
 import { Schema,model } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 
-const PersonSchema =Schema({
+const PersonSchema =new Schema({
     tip_doc: { 
         type: String, 
         required: true 
@@ -34,3 +34,4 @@ const PersonSchema =Schema({
 
 PersonSchema.plugin(mongoosePaginate);
 export default model("Person",PersonSchema ,"people");
+export { PersonSchema };

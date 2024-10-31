@@ -1,7 +1,7 @@
 import { Schema,model } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 
-const PaymentSchema=Schema({
+const PaymentSchema=new Schema({
     contrato: { 
         type: Schema.ObjectId, 
         ref: "Contract", 
@@ -18,3 +18,4 @@ const PaymentSchema=Schema({
 
 PaymentSchema.plugin(mongoosePaginate);
 export default model("Payment",PaymentSchema,"payments");
+export { PaymentSchema };

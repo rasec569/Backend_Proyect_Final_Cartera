@@ -5,7 +5,10 @@ dotenv.config();
 
 const connection = async()=>{
     try{
-        await connect(process.env.MONGODB_URI);
+        await connect(process.env.MONGODB_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
         console.log("Conectado correctamente a CarteraConstructora");
     }catch(error){
         console.log( "Error al conectar BD" ,error);

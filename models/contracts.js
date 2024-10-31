@@ -1,7 +1,7 @@
 import { Schema,model } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 
-const ContractSchema=Schema({
+const ContractSchema=new Schema({
     cliente: { 
         type: Schema.ObjectId, 
         ref: "Client", 
@@ -32,3 +32,4 @@ const ContractSchema=Schema({
 
 ContractSchema.plugin(mongoosePaginate);
 export default model("Contract",ContractSchema,"contracts");
+export { ContractSchema };
