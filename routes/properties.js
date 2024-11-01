@@ -5,7 +5,7 @@ import {
     getPropertyById,
     updateProperty,
     deleteProperty
-  } from "../controllers/propertyController.js";
+  } from "../controllers/property.js";
 
 const router=Router();
 // Crear una nueva propiedad

@@ -1,5 +1,5 @@
 import express from "express";
-import { getCartera } from "../controllers/carteraController.js";
+import { getCartera } from "../controllers/cartera.js";
 
 const router = express.Router();
 

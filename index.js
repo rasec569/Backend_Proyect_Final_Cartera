@@ -1,6 +1,6 @@
 //Importar dependencias
 import express from "express";
-import connection from "./database/connection.js";
+import { connection } from "./database/connection.js";
 import cors from "cors";
 import bodyParser from "body-parser";
 import CustomerRoutes from "./routes/clients.js";

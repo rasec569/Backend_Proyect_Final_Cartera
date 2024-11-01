@@ -1,6 +1,13 @@
 import Person from "../models/people.js";
 import User from "../models/users.js";
 
+// Metodo de prueba
+export const tesUser = (req, res) => { 
+    return res.status(200).send({ 
+        message: "Mensaje enviado desde el controlador de Usuarios" 
+    }); 
+};
+
 // Crear persona y usuario
 export const createdUser = async (req, res) => {
     const { tip_doc, doc_identifiacion, nombres, apellidos, email, telefono, direccion } = req.body.persona;

@@ -5,7 +5,7 @@ import {
     getPaymentById,
     updatePayment,
     deletePayment
-  } from "../controllers/paymentController.js";
+  } from "../controllers/payment.js";
 
 const router=Router();
 // Crear un nuevo pago

@@ -5,7 +5,7 @@ import {
     getContractById,
     updateContract,
     deleteContract
-  } from "../controllers/contractController.js";
+  } from "../controllers/contract.js";
 
 const router=Router();
 // Crear un nuevo contrato

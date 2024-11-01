@@ -5,7 +5,7 @@ import {
     getPersonById,
     updatePerson,
     deletePerson
-  } from "../controllers/personController.js";
+  } from "../controllers/person.js";
 
 const router=Router();
 // Crear una nueva persona

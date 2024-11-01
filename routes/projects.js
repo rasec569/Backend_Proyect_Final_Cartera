@@ -5,7 +5,7 @@ import {
     getProjectById,
     updateProject,
     deleteProject
-  } from "../controllers/projectController.js";
+  } from "../controllers/project.js";
 
 const router=Router();
 // Crear un nuevo proyecto

@@ -5,7 +5,7 @@ import {
     getClientById,
     updateClient,
     deleteClient
-  } from "../controllers/customerController.js";
+  } from "../controllers/customer.js";
 
 const router=Router();
 // Crear un nuevo cliente y persona
