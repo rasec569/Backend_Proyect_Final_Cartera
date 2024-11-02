@@ -10,7 +10,7 @@ import {
 
 const router=Router();
 
-router.post("/", tesUser);
+router.get("/test", tesUser);
 // Crear una nueva persona y usuario
 router.post("/", createdUser);
 

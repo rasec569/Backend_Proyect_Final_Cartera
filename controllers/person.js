@@ -3,9 +3,21 @@ import Person from "../models/people.js";
 // Crear persona
 export const createPerson = async (req, res) => {
   try {
-    const person = new Person(req.body);
-    await person.save();
-    res.status(201).json(person);
+    let person = req.body;
+
+    if(!person.tip_doc || !person.doc_identifiacion || !person.nombres || !person.apellidos || !person.email || !person.telefono ){
+      return res.status(400).json({
+        status:"error",
+        message:"Faltan datos por enviar"
+      });
+    }
+    let person_to_save= new Person(person);
+    await person_to_save.save();
+    res.status(200).json({
+      message:"Registro de persona exitoso",
+      person,
+      person_to_save
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

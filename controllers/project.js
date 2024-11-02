@@ -1,5 +1,11 @@
 import Project from "../models/projects.js";
 
+// Metodo de prueba
+export const tesProject = (req, res) => { 
+  return res.status(200).send({ 
+      message: "Mensaje enviado desde el controlador de Proyectos" 
+  }); 
+};
 // Crear proyecto
 export const createProject = async (req, res) => {
   try {

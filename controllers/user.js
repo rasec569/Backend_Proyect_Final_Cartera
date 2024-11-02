@@ -10,30 +10,72 @@ export const tesUser = (req, res) => {
 
 // Crear persona y usuario
 export const createdUser = async (req, res) => {
-    const { tip_doc, doc_identifiacion, nombres, apellidos, email, telefono, direccion } = req.body.persona;
-    const { nickname, contraseña, rol, estado } = req.body.usuario;
+    let params = req.body;
+
+    // Crear objetos persona y usuario a partir de los datos en params
+    let persona = {
+        tip_doc: params.tip_doc,
+        doc_identifiacion: params.doc_identifiacion,
+        nombres: params.nombres,
+        apellidos: params.apellidos,
+        email: params.email,
+        telefono: params.telefono,
+        direccion: params.direccion
+    };
+
+    let usuario = {
+        nickname: params.nickname,
+        contraseña: params.contraseña,
+        rol: params.rol,
+        estado: params.estado
+    };
 
     try {
+        // Validación de campos requeridos para persona
+        if (!persona.tip_doc || !persona.doc_identifiacion || !persona.nombres || !persona.apellidos || !persona.email || !persona.telefono) {
+            return res.status(400).json({
+                status: "error",
+                message: "Faltan datos requeridos para la persona",
+            });
+        }
+
+        // Validación de campos requeridos para usuario
+        if (!usuario.nickname || !usuario.contraseña || !usuario.rol || usuario.estado === undefined) {
+            return res.status(400).json({
+                status: "error",
+                message: "Faltan datos requeridos para el usuario",
+            });
+        }
+
         // Verificar si la persona ya existe por documento de identificación
-        let person = await Person.findOne({ doc_identifiacion });
+        let existingPerson = await Person.findOne({ doc_identifiacion: persona.doc_identifiacion });
 
         // Si la persona no existe, crearla
-        if (!person) {
-            person = new Person({ tip_doc, doc_identifiacion, nombres, apellidos, email, telefono, direccion });
-            await person.save();
+        if (!existingPerson) {
+            existingPerson = new Person(persona);
+            await existingPerson.save();
+        }
+
+        // Verificar si ya existe un usuario con el mismo nickname
+        const existingUser = await User.findOne({ nickname: usuario.nickname });
+        if (existingUser) {
+            return res.status(400).json({
+                status: "error",
+                message: "El nickname ya está en uso. Por favor elige otro.",
+            });
         }
 
         // Crear el usuario asociado a la persona
         const newUser = new User({
-            persona: person._id,
-            nickname,
-            contraseña,
-            rol,
-            estado,
+            persona: existingPerson._id,
+            nickname: usuario.nickname,
+            contraseña: usuario.contraseña,
+            rol: usuario.rol,
+            estado: usuario.estado,
         });
         const savedUser = await newUser.save();
 
-        res.status(201).json({
+        res.status(200).json({
             message: "Usuario creado con éxito.",
             usuario: savedUser,
         });

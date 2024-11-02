@@ -1,4 +1,10 @@
 import Property from "../models/properties.js";
+// Metodo de prueba
+export const tesProperty = (req, res) => { 
+  return res.status(200).send({ 
+      message: "Mensaje enviado desde el controlador de Property" 
+  }); 
+};
 
 // Crear propiedad
 export const createProperty = async (req, res) => {

@@ -4,10 +4,12 @@ import {
     getProperties,
     getPropertyById,
     updateProperty,
-    deleteProperty
+    deleteProperty,
+    tesProperty
   } from "../controllers/property.js";
 
 const router=Router();
+router.get("/test", tesProperty);
 // Crear una nueva propiedad
 router.post("/", createProperty);
 

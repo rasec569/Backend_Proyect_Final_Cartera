@@ -4,10 +4,12 @@ import {
     getProjects,
     getProjectById,
     updateProject,
-    deleteProject
+    deleteProject,
+    tesProject
   } from "../controllers/project.js";
 
 const router=Router();
+router.get("/test", tesProject)
 // Crear un nuevo proyecto
 router.post("/", createProject);
 

@@ -9,7 +9,7 @@ import {
 
 const router=Router();
 // Crear una nueva persona
-router.post("/", createPerson);
+router.post("/registrar", createPerson);
 
 // Obtener todas las personas
 router.get("/", getPeople);
