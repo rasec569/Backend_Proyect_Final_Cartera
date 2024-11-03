@@ -6,7 +6,7 @@ import Proyect from "../models/projects.js";
 import Property from "../models/properties.js"; 
 import User from "../models/users.js"; 
 import dotenv from "dotenv";
-import { connection, endconnection } from "./database/connection.js";
+import { connection, endconnection } from "./connection.js";
 
 dotenv.config();
 

@@ -6,7 +6,7 @@ const PersonSchema =new Schema({
         type: String, 
         required: true 
     },
-    doc_identifiacion: { 
+    doc_identificacion: { 
         type: String, 
         required: true, 
         unique: true 
@@ -27,8 +27,7 @@ const PersonSchema =new Schema({
         require:true
     },
     dirección:{
-        type:String,
-        require:true
+        type:String
     }   
 });
 

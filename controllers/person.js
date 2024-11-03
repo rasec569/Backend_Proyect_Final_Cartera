@@ -14,19 +14,22 @@ export const createPerson = async (req, res) => {
     //Obtener datos de la petición
     let person = req.body;
 
-    // Validar que existan los datos requeridos obtenidos 
-    if(!person.tip_doc || !person.doc_identifiacion || !person.nombres || !person.apellidos || !person.email || !person.telefono ){
-      return res.status(400).send({
-        status:"error",
-        message:"Faltan datos por enviar"
-      });
+    // Validación de campos requeridos para persona
+    const requiredPersonFields = ['tip_doc', 'doc_identificacion', 'nombres', 'apellidos', 'telefono'];
+    for (const field of requiredPersonFields) {
+        if (!person[field] || (field === 'doc_identificacion' && person[field] === '')) {
+            return res.status(400).send({
+                status: "error",
+                message: `El campo ${field} es requerido para la persona.`,
+            });
+        }
     }
 
     // Crear una nuevo objeto persona
     let person_to_save= new Person(person);
 
     // Control de persona duplicada
-    let existingPerson = await Person.findOne({ doc_identifiacion: person.doc_identifiacion });
+    let existingPerson = await Person.findOne({ doc_identificacion: person.doc_identificacion });
 
     // Si la persona ya existe, retornar error
     if(existingPerson){
@@ -39,14 +42,14 @@ export const createPerson = async (req, res) => {
     // Guardar la nueva persona en la base de datos
     await person_to_save.save();
 
-    res.status(201).json({
+    return res.status(201).json({
       status:"created",
       message:"Registro de persona exitoso",
       person_to_save
     });
   } catch (error) {
     console.log("Error al crear la persona:", error);
-    res.status(500).send({
+    return res.status(500).send({
       status:"error",
       message:"Error en el registro de persona"
     });
@@ -96,7 +99,7 @@ export const getPeople = async (req, res) => {
     
   } catch (error) {
     console.log("Error al obtener las persona", error);
-    res.status(500).json({
+    return res.status(500).json({
       status: "error",
       message: "Error al obtener las persona",
       error: error.message
@@ -129,7 +132,7 @@ export const getPersonById = async (req, res) => {
     });
   } catch (error) {
     console.log("Error al obtener la persona", error);
-    res.status(500).json({
+    return res.status(500).json({
       status: "error",
       message: "Error al obtener la persona",
       error: error.message
@@ -144,7 +147,7 @@ export const updatePerson = async (req, res) => {
     const personToUpdate = req.body;
 
     // Validar campos requeridos
-    const requiredFields = ['tip_doc', 'doc_identifiacion', 'nombres', 'apellidos', 'email', 'telefono'];
+    const requiredFields = ['tip_doc', 'doc_identificacion', 'nombres', 'apellidos', 'email', 'telefono'];
     for (const field of requiredFields) {
       if (!personToUpdate[field]) {
         return res.status(400).send({
@@ -154,13 +157,13 @@ export const updatePerson = async (req, res) => {
       }
     }
 
-    // Verificar si se intenta actualizar el doc_identifiacion
+    // Verificar si se intenta actualizar el doc_identificacion
     const existingPerson = await Person.findOne({
-      doc_identifiacion: personToUpdate.doc_identifiacion,
+      doc_identificacion: personToUpdate.doc_identificacion,
       _id: { $ne: personId } // Excluir el ID actual
     });
 
-    // Si se intenta actualizar el doc_identifiacion y ya existe una persona con el mismo documento, retornar error
+    // Si se intenta actualizar el doc_identificacion y ya existe una persona con el mismo documento, retornar error
     if (existingPerson) {
       return res.status(409).send({
         status: "error",
@@ -187,7 +190,7 @@ export const updatePerson = async (req, res) => {
     });
   } catch (error) {
     console.log("Error al actualizar la persona:", error);
-    res.status(500).json({
+    return res.status(500).json({
       status: "error",
       message: "Error al actualizar la persona",
       error: error.message,
@@ -219,7 +222,7 @@ export const deletePerson = async (req, res) => {
     });
   } catch (error) {
     console.log("Error al eliminar la persona:", error);
-    res.status(500).send({
+    return res.status(500).send({
       status: "error",
       message: "Error al eliminar la persona",
       error: error.message,
