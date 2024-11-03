@@ -19,7 +19,7 @@ router.post("/login", login);
 router.post("/registrar", ensureAuth, createdUser);
 
 // Obtener todos los usuarios
-router.get("/", ensureAuth, getAllUsers);
+router.get("/:page?", ensureAuth, getAllUsers);
 
 // Obtener usuario por ID
 router.get("/:id", ensureAuth, getUserById);

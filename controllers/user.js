@@ -12,12 +12,13 @@ export const tesUser = (req, res) => {
 
 // Crear persona y usuario
 export const createdUser = async (req, res) => {
+    //Obtener datos de la petición
     const params = req.body;
 
     // Crear objetos persona y usuario a partir de los datos en params
     const persona = {
         tip_doc: params.tip_doc,
-        doc_identifiacion: params.doc_identifiacion,
+        doc_identificacion: params.doc_identificacion,
         nombres: params.nombres,
         apellidos: params.apellidos,
         email: params.email,
@@ -34,23 +35,29 @@ export const createdUser = async (req, res) => {
 
     try {
         // Validación de campos requeridos para persona
-        if (!persona.tip_doc || !persona.doc_identifiacion || !persona.nombres || !persona.apellidos || !persona.email || !persona.telefono) {
-            return res.status(400).send({
-                status: "error",
-                message: "Faltan datos requeridos para la persona",
-            });
+        const requiredPersonFields = ['tip_doc', 'doc_identificacion', 'nombres', 'apellidos', 'email', 'telefono'];
+        for (const field of requiredPersonFields) {
+            if (!persona[field]) {
+                return res.status(400).send({
+                    status: "error",
+                    message: `El campo ${field} es requerido para la persona.`,
+                });
+            }
         }
 
         // Validación de campos requeridos para usuario
-        if (!usuario.nickname || !usuario.contraseña || !usuario.rol || usuario.estado === undefined) {
-            return res.status(400).send({
-                status: "error",
-                message: "Faltan datos requeridos para el usuario",
-            });
+        const requiredUserFields = ['nickname', 'contraseña', 'rol', 'estado'];
+        for (const field of requiredUserFields) {
+            if (usuario[field] === undefined || usuario[field] === '') {
+                return res.status(400).send({
+                    status: "error",
+                    message: `El campo ${field} es requerido para el usuario.`,
+                });
+            }
         }
 
         // Verificar si la persona ya existe por documento de identificación
-        let existingPerson = await Person.findOne({ doc_identifiacion: persona.doc_identifiacion });
+        let existingPerson = await Person.findOne({ doc_identificacion: persona.doc_identificacion });
 
         // Si la persona no existe, crearla
         if (!existingPerson) {
@@ -107,10 +114,10 @@ export const createdUser = async (req, res) => {
 
 // Login user
 export const login = async (req, res) => {
-    try {
-        // Recibe nickname y contraseña del request body
-        const { nickname, contraseña } = req.body;
 
+    const { nickname, contraseña } = req.body;
+
+    try {
         // Valida que nickname y contraseña estén presentes en el request body
         if (!nickname ||!contraseña) {
             return res.status(400).send({ 
@@ -161,51 +168,132 @@ export const login = async (req, res) => {
 
 // Obtener todos los usuarios
 export const getAllUsers = async (req, res) => {
-    try {
-        const users = await User.find({ estado: true }).populate("persona");
-        res.status(200).json(users);
+
+    const page = req.params.page ? parseInt(req.params.page, 10) : 1;
+    const itemsPerPage = req.params.limit ? parseInt(req.params.limit, 10) : 10;
+    const options = {
+        page: page,
+        limit: itemsPerPage,
+        select: '-contraseña -__v',
+        sort: { nickname: 1 }
+    };
+
+    try {      
+
+        const users = await User.paginate({ estado: true }, options).populate("persona");
+
+        if (!users || users.docs.length === 0) {
+            return res.status(404).send({
+                status: "error",
+                message: "No hay usuarios para mostrar"
+            });
+        }
+
+        return res.status(200).json({
+            status: "success",
+            message: "Usuarios encontrados",
+            users: users.docs,
+            totalDocs: users.totalDocs,
+            totalPages: users.totalPages,
+            currentPage: users.page,
+            itemsPerPage: users.limit
+        });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error("Error al obtener los usuarios", error);
+        return res.status(500).json({
+            status: "error",
+            message: "Error al obtener los usuarios",
+            error: error.message
+        });
     }
 };
 
 // Obtener un usuario por ID
 export const getUserById = async (req, res) => {
+
     const { id } = req.params;
 
     try {
-        const user = await User.findOne({ _id: id, estado: true }).populate("persona");
+        const user = await User.findOne({ _id: id, estado: true }).populate("persona").select('-contraseña -__v');
+        
         if (!user) {
-            return res.status(404).json({ message: "Usuario no encontrado." });
+            return res.status(404).json({
+                status: "error",
+                message: "Usuario no encontrado"
+            });
         }
-        res.status(200).json(user);
+        
+        return res.status(200).json({
+            status: "success",
+            message: "Usuario encontrado",
+            user
+        });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error("Error al obtener el usuario", error);
+        return res.status(500).json({
+            status: "error",
+            message: "Error al obtener el usuario",
+            error: error.message
+        });
     }
 };
 
 // Actualizar usuario
 export const updateUser = async (req, res) => {
-    const { id } = req.params;
-    const { nickname, contraseña, rol, estado } = req.body.usuario;
 
-    try {
-        const updatedUser = await User.findByIdAndUpdate(
-            id,
-            { nickname, contraseña, rol, estado },
-            { new: true }
-        );
+    const userId = req.params.id;
+    const userToUpdate = req.body;
 
-        if (!updatedUser) {
-            return res.status(404).json({ message: "Usuario no encontrado." });
+    try {       
+        // Validar que los campos requeridos no estén vacíos o nulos
+        const requiredFields = ['nickname', 'contraseña', 'rol', 'estado'];
+        for (const field of requiredFields) {
+            if (!userToUpdate[field]) {
+                return res.status(400).send({
+                    status: "error",
+                    message: `El campo ${field} es requerido.`,
+                });
+            }
         }
 
-        res.status(200).json({
-            message: "Usuario actualizado con éxito.",
-            usuario: updatedUser,
+        // Verificar si el nickname está en uso por otro usuario
+        const existingUser = await User.findOne({ nickname: userToUpdate.nickname, _id: { $ne: userId } });
+        if (existingUser) {
+            return res.status(409).send({
+                status: "error",
+                message: "El nickname ya está en uso por otro usuario"
+            });
+        }
+
+        // Cifrar la contraseña si se proporciona
+        if (userToUpdate.contraseña) {
+            const salt = await bcrypt.genSalt(10);
+            userToUpdate.contraseña = await bcrypt.hash(userToUpdate.contraseña, salt);
+        }
+
+        // Buscar y actualizar el usuario
+        const updatedUser = await User.findByIdAndUpdate(userId, userToUpdate, { new: true });
+
+        // Verificar si el usuario existe
+        if (!updatedUser) {
+            return res.status(404).json({
+                status: "error",
+                message: "Usuario no encontrado"
+            });
+        }
+
+        return res.status(200).json({
+            status: "success",
+            message: "Usuario actualizado con éxito",
+            usuario: updatedUser
         });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error("Error al actualizar el usuario", error);
+        return res.status(500).json({
+            status: "error",
+            message: "Error al actualizar el usuario",
+            error: error.message
+        });
     }
 };
 
@@ -215,21 +303,32 @@ export const deleteUser = async (req, res) => {
     const { estado } = req.body;
 
     try {
-        const updatedUser = await User.findByIdAndUpdate(
-            id,
-            { estado },
-            { new: true }
-        );
-
-        if (!updatedUser) {
-            return res.status(404).json({ message: "Usuario no encontrado." });
+        if (typeof estado !== 'boolean') {
+            return res.status(400).json({
+                status: "error",
+                message: "El estado debe ser un valor booleano (true o false)"
+            });
         }
 
-        res.status(200).json({
-            message: "Estado del usuario actualizado con éxito.",
-            usuario: updatedUser,
+        const updatedUser = await User.findByIdAndUpdate(id, { estado }, { new: true });
+        if (!updatedUser) {
+            return res.status(404).json({
+                status: "error",
+                message: "Usuario no encontrado"
+            });
+        }
+
+        return res.status(200).json({
+            status: "success",
+            message: "Estado del usuario actualizado con éxito",
+            usuario: updatedUser
         });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error("Error al cambiar el estado del usuario", error);
+        return res.status(500).json({
+            status: "error",
+            message: "Error al cambiar el estado del usuario",
+            error: error.message
+        });
     }
 };
