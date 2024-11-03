@@ -5,14 +5,17 @@ import {
     getUserById,
     updateUser,
     deleteUser,
-    tesUser
+    tesUser,
+    login
   } from "../controllers/user.js";
 
 const router=Router();
 
 router.get("/test", tesUser);
+// login
+router.post("/login", login);
 // Crear una nueva persona y usuario
-router.post("/", createdUser);
+router.post("/registrar", createdUser);
 
 // Obtener todos los usuarios
 router.get("/", getAllUsers);

@@ -1,25 +1,55 @@
 import Person from "../models/people.js";
 
+// Metodo de prueba
+export const testPerson = (req, res) => { 
+  return res.status(200).send({ 
+      message: "Mensaje enviado desde el controlador de Personas" 
+  }); 
+};
+
 // Crear persona
 export const createPerson = async (req, res) => {
   try {
+
+    //Obtener datos de la petición
     let person = req.body;
 
+    // Validar que existan los datos requeridos obtenidos 
     if(!person.tip_doc || !person.doc_identifiacion || !person.nombres || !person.apellidos || !person.email || !person.telefono ){
-      return res.status(400).json({
+      return res.status(400).send({
         status:"error",
         message:"Faltan datos por enviar"
       });
     }
+
+    // Crear una nuevo objeto persona
     let person_to_save= new Person(person);
+
+    // Control de persona duplicada
+    let existingPerson = await Person.findOne({ doc_identifiacion: person.doc_identifiacion });
+
+    // Si la persona ya existe, retornar error
+    if(existingPerson){
+      return res.status(409).send({
+        status:"error",
+        message:"La persona ya existe"
+      });
+    }
+
+    // Guardar la nueva persona en la base de datos
     await person_to_save.save();
-    res.status(200).json({
+
+    res.status(201).json({
+      status:"created",
       message:"Registro de persona exitoso",
-      person,
       person_to_save
     });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.log("Error al crear la persona:", error);
+    res.status(500).send({
+      status:"error",
+      message:"Error en el registro de persona"
+    });
   }
 };
 

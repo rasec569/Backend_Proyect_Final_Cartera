@@ -4,10 +4,12 @@ import {
     getPeople,
     getPersonById,
     updatePerson,
-    deletePerson
+    deletePerson, 
+    testPerson
   } from "../controllers/person.js";
 
 const router=Router();
+router.get("/test", testPerson);
 // Crear una nueva persona
 router.post("/registrar", createPerson);
 

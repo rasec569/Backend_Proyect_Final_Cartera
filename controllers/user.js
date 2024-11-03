@@ -1,5 +1,7 @@
 import Person from "../models/people.js";
 import User from "../models/users.js";
+import bcrypt from "bcrypt";
+import { createToken } from "../services/jwt.js";
 
 // Metodo de prueba
 export const tesUser = (req, res) => { 
@@ -10,10 +12,10 @@ export const tesUser = (req, res) => {
 
 // Crear persona y usuario
 export const createdUser = async (req, res) => {
-    let params = req.body;
+    const params = req.body;
 
     // Crear objetos persona y usuario a partir de los datos en params
-    let persona = {
+    const persona = {
         tip_doc: params.tip_doc,
         doc_identifiacion: params.doc_identifiacion,
         nombres: params.nombres,
@@ -23,7 +25,7 @@ export const createdUser = async (req, res) => {
         direccion: params.direccion
     };
 
-    let usuario = {
+    const usuario = {
         nickname: params.nickname,
         contraseña: params.contraseña,
         rol: params.rol,
@@ -33,7 +35,7 @@ export const createdUser = async (req, res) => {
     try {
         // Validación de campos requeridos para persona
         if (!persona.tip_doc || !persona.doc_identifiacion || !persona.nombres || !persona.apellidos || !persona.email || !persona.telefono) {
-            return res.status(400).json({
+            return res.status(400).send({
                 status: "error",
                 message: "Faltan datos requeridos para la persona",
             });
@@ -41,7 +43,7 @@ export const createdUser = async (req, res) => {
 
         // Validación de campos requeridos para usuario
         if (!usuario.nickname || !usuario.contraseña || !usuario.rol || usuario.estado === undefined) {
-            return res.status(400).json({
+            return res.status(400).send({
                 status: "error",
                 message: "Faltan datos requeridos para el usuario",
             });
@@ -56,31 +58,104 @@ export const createdUser = async (req, res) => {
             await existingPerson.save();
         }
 
+        // Crear el objeto usuario con los datos de `usuario`
+        const user_to_save = new User({
+            nickname: usuario.nickname,
+            contraseña: usuario.contraseña,  // contraseña se sobrescribirá después del hash
+            rol: usuario.rol,
+            estado: usuario.estado,
+            persona: existingPerson._id
+        });
+
         // Verificar si ya existe un usuario con el mismo nickname
-        const existingUser = await User.findOne({ nickname: usuario.nickname });
+        const existingUser = await User.findOne({ nickname: user_to_save.nickname });
+
         if (existingUser) {
-            return res.status(400).json({
+            return res.status(409).send({
                 status: "error",
                 message: "El nickname ya está en uso. Por favor elige otro.",
             });
         }
 
-        // Crear el usuario asociado a la persona
-        const newUser = new User({
-            persona: existingPerson._id,
-            nickname: usuario.nickname,
-            contraseña: usuario.contraseña,
-            rol: usuario.rol,
-            estado: usuario.estado,
-        });
-        const savedUser = await newUser.save();
+        // Cifrar la contraseña solo si está definida y no vacía
+        if (user_to_save.contraseña) {
+            const salt = await bcrypt.genSalt(10);
+            user_to_save.contraseña = await bcrypt.hash(user_to_save.contraseña, salt);
+        } else {
+            return res.status(400).send({
+                status: "error",
+                message: "La contraseña no puede estar vacía."
+            });
+        }
 
-        res.status(200).json({
+        // Guarda el usuario        
+        await user_to_save.save();
+
+        res.status(201).json({
+            status: "created",
             message: "Usuario creado con éxito.",
-            usuario: savedUser,
+            user: user_to_save
         });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.log("Error al crear el usuario", error);
+        res.status(500).send({
+            status: "error",
+            message: "Error al crear el usuario",
+        });
+    }
+};
+
+// Login user
+export const login = async (req, res) => {
+    try {
+        // Recibe nickname y contraseña del request body
+        const { nickname, contraseña } = req.body;
+
+        // Valida que nickname y contraseña estén presentes en el request body
+        if (!nickname ||!contraseña) {
+            return res.status(400).send({ 
+                status: "error",
+                message: "Debes proporcionar un nickname o una contraseña." });
+        }
+        
+        // Busca al usuario por nickname 
+        const userBd = await User.findOne({ nickname:nickname });
+
+        // Valida que el usuario exista 
+        if (!userBd) {
+            return res.status(404).send({ 
+                status: "error",
+                message: "Usuario no encontrado." 
+            });
+        }
+
+        // Valida que la contraseña sea correcta
+        const validPassword = await bcrypt.compare(contraseña, userBd.contraseña);
+
+        // Valida que la contraseña sea correcta
+        if (!validPassword) {
+            return res.status(401).send({ 
+                status: "error",
+                message: "Contraseña incorrecta." 
+            });
+        }
+
+        // Genera un token con JWT
+        const token = createToken(userBd);
+        
+        // Devuelve el token al usuario
+        res.status(200).json({ 
+            status: "success",
+            message: "Usuario logueado correctamente.",
+            userBd,
+            token
+        });
+    } catch (error) {
+        console.log("Error al loguear el usuario", error);
+        res.status(500).send({
+            status: "error",
+            message: "Error al loguear el usuario"
+        });
     }
 };
 
