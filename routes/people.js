@@ -15,7 +15,7 @@ router.get("/test", testPerson);
 router.post("/registrar", ensureAuth, createPerson);
 
 // Obtener todas las personas
-router.get("/:page?", ensureAuth, getPeople);
+router.get("/all/:page?", ensureAuth, getPeople);
 
 // Obtener persona por ID
 router.get("/:id", ensureAuth, getPersonById);

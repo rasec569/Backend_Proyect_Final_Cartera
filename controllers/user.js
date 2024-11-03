@@ -168,35 +168,38 @@ export const login = async (req, res) => {
 
 // Obtener todos los usuarios
 export const getAllUsers = async (req, res) => {
-
     const page = req.params.page ? parseInt(req.params.page, 10) : 1;
     const itemsPerPage = req.params.limit ? parseInt(req.params.limit, 10) : 10;
-    const options = {
-        page: page,
-        limit: itemsPerPage,
-        select: '-contraseña -__v',
-        sort: { nickname: 1 }
-    };
 
-    try {      
+    try {
+        // Primero obtenemos todos los usuarios y aplicamos populate
+        const users = await User.find({ estado: true })
+            .select('-contraseña -__v')
+            .populate("persona")
+            .sort({ nickname: 1 })
+            .skip((page - 1) * itemsPerPage) // Aplicamos la paginación
+            .limit(itemsPerPage); // Limitamos los resultados
 
-        const users = await User.paginate({ estado: true }, options).populate("persona");
+        const totalDocs = await User.countDocuments({ estado: true }); // Contamos el total de documentos
 
-        if (!users || users.docs.length === 0) {
+        if (!users || users.length === 0) {
             return res.status(404).send({
                 status: "error",
                 message: "No hay usuarios para mostrar"
             });
         }
 
+        // Calculamos el total de páginas
+        const totalPages = Math.ceil(totalDocs / itemsPerPage);
+
         return res.status(200).json({
             status: "success",
             message: "Usuarios encontrados",
-            users: users.docs,
-            totalDocs: users.totalDocs,
-            totalPages: users.totalPages,
-            currentPage: users.page,
-            itemsPerPage: users.limit
+            users: users,
+            totalDocs: totalDocs,
+            totalPages: totalPages,
+            currentPage: page,
+            itemsPerPage: itemsPerPage
         });
     } catch (error) {
         console.error("Error al obtener los usuarios", error);
@@ -238,15 +241,13 @@ export const getUserById = async (req, res) => {
     }
 };
 
-// Actualizar usuario
 export const updateUser = async (req, res) => {
-
     const userId = req.params.id;
     const userToUpdate = req.body;
 
-    try {       
+    try {
         // Validar que los campos requeridos no estén vacíos o nulos
-        const requiredFields = ['nickname', 'contraseña', 'rol', 'estado'];
+        const requiredFields = ['nickname', 'rol', 'estado'];
         for (const field of requiredFields) {
             if (!userToUpdate[field]) {
                 return res.status(400).send({
@@ -269,6 +270,9 @@ export const updateUser = async (req, res) => {
         if (userToUpdate.contraseña) {
             const salt = await bcrypt.genSalt(10);
             userToUpdate.contraseña = await bcrypt.hash(userToUpdate.contraseña, salt);
+        } else {
+            // Si no se proporciona contraseña, eliminarla del objeto de actualización
+            delete userToUpdate.contraseña;
         }
 
         // Buscar y actualizar el usuario
@@ -300,9 +304,14 @@ export const updateUser = async (req, res) => {
 // Cambiar el estado de un usuario
 export const deleteUser = async (req, res) => {
     const { id } = req.params;
-    const { estado } = req.body;
+    let { estado } = req.body;
 
     try {
+        // Convertir 'estado' a un valor booleano explícito
+        if (estado === 'true') estado = true;
+        else if (estado === 'false') estado = false;
+
+        // Validar que 'estado' sea un booleano
         if (typeof estado !== 'boolean') {
             return res.status(400).json({
                 status: "error",
