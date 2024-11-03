@@ -25,13 +25,45 @@ const initDatabase = async () => {
             Property,
             User
         };
-        console.log("Modelos creados");        
+        console.log("Modelos creados");
+
+        // Agregar el campo 'estado' a las colecciones existentes
+        await updateContracts();
+        await updatePayments();
+        await updateProperties();
 
         // Cerrar la conexión
         await endconnection();
     } catch (error) {
         console.error("Error al conectar a MongoDB:", error);
     }
+};
+
+// Función para agregar el campo 'estado' en la colección de contratos
+const updateContracts = async () => {
+    const contractUpdateResult = await Contract.updateMany(
+        { estado: { $exists: false } }, // Solo actualiza los documentos que no tienen el campo
+        { $set: { estado: true } } // Establece el campo 'estado' a true
+    );
+    console.log(`Documentos de contrato actualizados: ${contractUpdateResult.modifiedCount}`);
+};
+
+// Función para agregar el campo 'estado' en la colección de pagos
+const updatePayments = async () => {
+    const paymentUpdateResult = await Payment.updateMany(
+        { estado: { $exists: false } }, // Solo actualiza los documentos que no tienen el campo
+        { $set: { estado: true } } // Establece el campo 'estado' a true
+    );
+    console.log(`Documentos de pago actualizados: ${paymentUpdateResult.modifiedCount}`);
+};
+
+// Función para agregar el campo 'estado' en la colección de propiedades
+const updateProperties = async () => {
+    const propertyUpdateResult = await Property.updateMany(
+        { estado: { $exists: false } }, // Solo actualiza los documentos que no tienen el campo
+        { $set: { estado: true } } // Establece el campo 'estado' a true
+    );
+    console.log(`Documentos de propiedad actualizados: ${propertyUpdateResult.modifiedCount}`);
 };
 
 // Ejecutar la función de inicialización

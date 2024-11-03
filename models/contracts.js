@@ -28,6 +28,10 @@ const ContractSchema=new Schema({
         type:Number,
         required:true,
     },
+    estado:{
+        type: Boolean,
+        require:true
+    }
 });
 
 ContractSchema.plugin(mongoosePaginate);

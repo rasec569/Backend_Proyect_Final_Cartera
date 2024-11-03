@@ -17,6 +17,10 @@ const PropertySchema=new Schema({
     descripcion: { 
         type: String 
     },
+    estado:{
+        type: Boolean,
+        require:true
+    }
 });
 PropertySchema.plugin(mongoosePaginate);
 export default model("Property", PropertySchema,"properties");

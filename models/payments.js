@@ -14,6 +14,10 @@ const PaymentSchema=new Schema({
         type: Number, 
         required: true 
     },
+    estado:{
+        type: Boolean,
+        require:true
+    }
 });
 
 PaymentSchema.plugin(mongoosePaginate);
