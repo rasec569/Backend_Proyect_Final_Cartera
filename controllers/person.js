@@ -9,11 +9,11 @@ export const testPerson = (req, res) => {
 
 // Crear persona
 export const createPerson = async (req, res) => {
-  try {
 
-    //Obtener datos de la petición
-    let person = req.body;
+  //Obtener datos de la petición
+  let person = req.body;
 
+  try {  
     // Validación de campos requeridos para persona
     const requiredPersonFields = ['tip_doc', 'doc_identificacion', 'nombres', 'apellidos', 'telefono'];
     for (const field of requiredPersonFields) {
@@ -58,13 +58,13 @@ export const createPerson = async (req, res) => {
 
 // Obtener todas las personas
 export const getPeople = async (req, res) => {
-  try {
-    // Obtener la página desde los parámetros de la solicitud
-    let page=req.params.page? parseInt(req.params.page, 10) :1;
+   // Obtener la página desde los parámetros de la solicitud
+   let page=req.params.page? parseInt(req.params.page, 10) :1;
 
-    // Obtener el número de personas por página desde los parámetros de la solicitud
-    let itemsPorPage=req.params.limit? parseInt(req.params.limit, 10) :10;
-    
+   // Obtener el número de personas por página desde los parámetros de la solicitud
+   let itemsPorPage=req.params.limit? parseInt(req.params.limit, 10) :10;
+   
+  try {
     const options={
       page: page,
       limit: itemsPorPage,
@@ -109,10 +109,8 @@ export const getPeople = async (req, res) => {
 
 // Obtener persona por ID
 export const getPersonById = async (req, res) => {
+  const personId = req.params.id;
   try {
-    // Obtener el id de la persona desde los parámetros de la solicitud
-    const personId = req.params.id;
-
     // Buscar la persona en la base de datos y excluir ciertos campos
     const person = await Person.findById(personId).select('-email -dirección -__v');
 
@@ -142,10 +140,11 @@ export const getPersonById = async (req, res) => {
 
 // Actualizar persona
 export const updatePerson = async (req, res) => {
-  try {
-    const personId = req.params.id;
-    const personToUpdate = req.body;
 
+  const personId = req.params.id;
+  const personToUpdate = req.body;
+
+  try {
     // Validar campos requeridos
     const requiredFields = ['tip_doc', 'doc_identificacion', 'nombres', 'apellidos', 'email', 'telefono'];
     for (const field of requiredFields) {
@@ -200,9 +199,10 @@ export const updatePerson = async (req, res) => {
 
 // Eliminar persona
 export const deletePerson = async (req, res) => {
-  try {
-    const personId = req.params.id;
 
+  const personId = req.params.id;
+
+  try {
     // Buscar la persona para verificar si existe antes de eliminarla
     const person = await Person.findById(personId);
     if (!person) {

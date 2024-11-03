@@ -214,10 +214,10 @@ export const getAllUsers = async (req, res) => {
 // Obtener un usuario por ID
 export const getUserById = async (req, res) => {
 
-    const { id } = req.params;
+    const userId = req.params.id;
 
     try {
-        const user = await User.findOne({ _id: id, estado: true }).populate("persona").select('-contraseña -__v');
+        const user = await User.findOne({ _id: userId, estado: true }).populate("persona").select('-contraseña -__v');
         
         if (!user) {
             return res.status(404).json({

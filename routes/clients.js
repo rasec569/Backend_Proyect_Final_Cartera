@@ -1,25 +1,29 @@
 import { Router } from "express";
+import {ensureAuth} from "../middlewares/auth.js";
 import {
     createCustomer,
     getClients,
     getClientById,
     updateClient,
-    deleteClient
+    deleteClient, 
+    testCustomer
   } from "../controllers/customer.js";
 
 const router=Router();
+
+router.get("/test", testCustomer);
 // Crear un nuevo cliente y persona
-router.post("/", createCustomer);
+router.post("/registrar", ensureAuth, createCustomer);
 
 // Obtener todos los clientes
-router.get("/", getClients);
+router.get("/all/:page?", ensureAuth, getClients);
 
 // Obtener cliente por ID
-router.get("/:id", getClientById);
+router.get("/:id", ensureAuth, getClientById);
 
 // Actualizar cliente por ID
-router.put("/:id", updateClient);
+router.put("/:id", ensureAuth, updateClient);
 
 // Cambiar el estado del cliente (marcar como eliminado)
-router.patch("/:id", deleteClient);
+router.patch("/:id", ensureAuth, deleteClient);
 export default router;
