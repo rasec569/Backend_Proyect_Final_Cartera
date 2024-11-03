@@ -1,8 +1,10 @@
 import jwt from 'jsonwebtoken';
 import moment from 'moment';
+import dotenv from 'dotenv';
 
+dotenv.config();
 // Clave secreta desde variables de entorno
-const secret = process.env.JWT_SECRET || 'Cartera_Constructora_Bootcamp';
+export const secret = process.env.SECRET_KEY || 'Cartera_Constructora_Bootcamp';
 
 // Crear token
 export const createToken = (user) => {

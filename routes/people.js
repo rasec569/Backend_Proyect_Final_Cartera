@@ -7,22 +7,23 @@ import {
     deletePerson, 
     testPerson
   } from "../controllers/person.js";
+import {ensureAuth} from "../middlewares/auth.js";
 
 const router=Router();
 router.get("/test", testPerson);
 // Crear una nueva persona
-router.post("/registrar", createPerson);
+router.post("/registrar", ensureAuth, createPerson);
 
 // Obtener todas las personas
-router.get("/", getPeople);
+router.get("/", ensureAuth, getPeople);
 
 // Obtener persona por ID
-router.get("/:id", getPersonById);
+router.get("/:id", ensureAuth, getPersonById);
 
 // Actualizar persona por ID
-router.put("/:id", updatePerson);
+router.put("/:id", ensureAuth, updatePerson);
 
 // Eliminar persona por ID
-router.delete("/:id", deletePerson);
+router.delete("/:id", ensureAuth, deletePerson);
 
 export default router;
