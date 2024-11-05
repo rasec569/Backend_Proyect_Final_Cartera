@@ -2,10 +2,10 @@ import Customer from "../models/clients.js";
 import Person from "../models/people.js";
 
 // Metodo de prueba
-export const testCustomer = (req, res) => { 
-    return res.status(200).send({ 
-        message: "Mensaje enviado desde el controlador de cliente" 
-    }); 
+export const testCustomer = (req, res) => {
+    return res.status(200).send({
+        message: "Mensaje enviado desde el controlador de cliente"
+    });
 };
 // Crear persona y cliente
 export const createCustomer = async (req, res) => {
@@ -198,6 +198,58 @@ export const updateClient = async (req, res) => {
     }
 };
 
+//Obtener historial de pagos por cliente
+export const getPaymentHistoryByClient = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const payments = await Payment.find({ cliente: id }).populate("contrato");
+
+        if (!payments.length) {
+            return res.status(404).json({
+                status: "error",
+                message: "No se encontraron pagos para este cliente",
+            });
+        }
+
+        return res.status(200).json({
+            status: "success",
+            payments,
+        });
+    } catch (error) {
+        console.error("Error al obtener el historial de pagos del cliente:", error);
+        return res.status(500).json({
+            status: "error",
+            message: "Error al obtener el historial de pagos del cliente",
+            error: error.message,
+        });
+    }
+};
+//Obtener pagos pendientes por cliente
+
+export const getPendingPaymentsByClient = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const contracts = await Contract.find({ cliente: id, estado: true }).populate("pagos");
+        const pendingPayments = contracts.map(contract => {
+            const totalPaid = contract.pagos.reduce((sum, payment) => sum + payment.monto, 0);
+            return { contrato: contract, saldoPendiente: contract.total - totalPaid };
+        });
+
+        return res.status(200).json({
+            status: "success",
+            pendingPayments,
+        });
+    } catch (error) {
+        console.error("Error al obtener pagos pendientes del cliente:", error);
+        return res.status(500).json({
+            status: "error",
+            message: "Error al obtener pagos pendientes del cliente",
+            error: error.message,
+        });
+    }
+};
 
 // Cambiar el estado de un cliente
 export const deleteClient = async (req, res) => {

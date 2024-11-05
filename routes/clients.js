@@ -6,6 +6,7 @@ import {
     getClientById,
     updateClient,
     deleteClient, 
+    getPaymentHistoryByClient,
     testCustomer
   } from "../controllers/customer.js";
 
@@ -20,6 +21,13 @@ router.get("/all/:page?", ensureAuth, getClients);
 
 // Obtener cliente por ID
 router.get("/:id", ensureAuth, getClientById);
+
+// Obtener historial de pagos por cliente
+router.get("/pagos/:id", ensureAuth, getPaymentHistoryByClient);
+
+//Obtener pagos pendientes por cliente
+router.get("/pendientes/:id", ensureAuth, getClientById);
+//Obtener clientes con contratos impagos o saldo vencido
 
 // Actualizar cliente por ID
 router.put("/:id", ensureAuth, updateClient);
