@@ -172,11 +172,11 @@ export const updateContract = async (req, res) => {
 
 // Obtener todos los contratos de un cliente
 export const getContractsByClient = async (req, res) => {
-  const { clienteId } = req.params;
+  const { id } = req.params;
 
   try {
     // Buscar todos los contratos asociados al cliente
-    const contracts = await Contract.find({ cliente: clienteId })
+    const contracts = await Contract.find({ cliente: id })
       .populate("cliente propiedad") // Incluye detalles de cliente y propiedad
       .sort({ fecha_contrato: -1 }); // Ordena si es necesario, por ejemplo, por fecha de contrato descendente
 
@@ -199,6 +199,68 @@ export const getContractsByClient = async (req, res) => {
     return res.status(500).json({
       status: "error",
       message: "Error al obtener contratos del cliente.",
+      error: error.message,
+    });
+  }
+};
+//Obtener saldo pendiente por contrato
+export const getPendingBalanceByContract = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const contract = await Contract.findById(id).populate("pagos");
+    if (!contract) {
+      return res.status(404).json({
+        status: "error",
+        message: "Contrato no encontrado",
+      });
+    }
+
+    const totalPaid = contract.pagos.reduce((sum, payment) => sum + payment.monto, 0);
+    const pendingBalance = contract.total - totalPaid;
+
+    return res.status(200).json({
+      status: "success",
+      pendingBalance,
+    });
+  } catch (error) {
+    console.error("Error al obtener el saldo pendiente del contrato:", error);
+    return res.status(500).json({
+      status: "error",
+      message: "Error al obtener el saldo pendiente del contrato",
+      error: error.message,
+    });
+  }
+};
+
+//Obtener contratos próximos a vencer o con pagos atrasados
+export const getContractsDueSoon = async (req, res) => {
+  const daysToDue = 7; // Días para notificación de vencimiento próximo
+
+  try {
+    const contracts = await Contract.find().populate("pagos");
+
+    const dueSoonContracts = contracts.filter(contract => {
+      const nextPaymentDate = /* lógica para calcular la próxima fecha de pago */;
+      return (nextPaymentDate - Date.now()) <= daysToDue * 86400000;
+    });
+
+    if (!dueSoonContracts.length) {
+      return res.status(404).json({
+        status: "error",
+        message: "No hay contratos próximos a vencer",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      dueSoonContracts,
+    });
+  } catch (error) {
+    console.error("Error al obtener contratos próximos a vencer:", error);
+    return res.status(500).json({
+      status: "error",
+      message: "Error al obtener contratos próximos a vencer",
       error: error.message,
     });
   }
