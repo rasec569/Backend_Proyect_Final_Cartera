@@ -4,7 +4,7 @@ import mongoosePaginate from "mongoose-paginate-v2";
 const ContractSchema=new Schema({
     cliente: { 
         type: Schema.ObjectId, 
-        ref: "Client", 
+        ref: "Customer", 
         required: true 
     },
     propiedad: { 
@@ -30,7 +30,8 @@ const ContractSchema=new Schema({
     },
     estado:{
         type: Boolean,
-        require:true
+        require:true,
+        default: true
     }
 });
 

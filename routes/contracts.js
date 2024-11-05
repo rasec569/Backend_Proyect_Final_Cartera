@@ -6,7 +6,10 @@ import {
     getContractById,
     updateContract,
     deleteContract,
-    getPropertiesByClient,
+    getContractsByClient,
+    getPendingBalanceByContract ,
+    getContractsDueSoon ,
+
     testContract
   } from "../controllers/contract.js";
 
@@ -16,21 +19,29 @@ const router=Router();
 router.get("/test", testContract);
 
 // Crear un nuevo contrato
-router.post("/", ensureAuth, createContract);
+router.post("/registrar", ensureAuth, createContract);
 
-// Obtener todos los contratos
-router.get("/all/:page?:", ensureAuth, getContracts);
+// Definir la ruta para obtener todos los contratos con paginación
+router.get("/all/:page?", ensureAuth, getContracts);
 
-// Obtener contrato por ID
+// Ruta para obtener contratos de un cliente
+router.get('/contract/:id', ensureAuth, getContractsByClient);
+
+// Ruta para obtener saldo pendiente por contrato
+router.get('/pendiente/:id', ensureAuth, getPendingBalanceByContract);
+
+// Ruta para obtener contratos próximos a vencer o con pagos atrasados
+router.get('/:vencimientos', ensureAuth, getContractsDueSoon );
+
+// Definir la ruta para obtener un contrato por ID
 router.get("/:id", ensureAuth, getContractById);
 
 // Actualizar contrato por ID
 router.put("/:id", ensureAuth, updateContract);
 
 // Eliminar contrato por ID
-router.delete("/:id", ensureAuth, deleteContract);
+router.patch("/:id", ensureAuth, deleteContract);
 
-// Ruta para obtener propiedades de un cliente
-router.get('/:clienteId/properties', ensureAuth, getPropertiesByClient);
+
 
 export default router;
