@@ -12,7 +12,8 @@ const CustomerSchema=new Schema({
     },
     estado: { 
         type: Boolean, 
-        required: true 
+        required: true,
+        default: true
     }     
 });
 

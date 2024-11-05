@@ -16,7 +16,8 @@ const PaymentSchema=new Schema({
     },
     estado:{
         type: Boolean,
-        require:true
+        require:true,
+        default: true
     }
 });
 
