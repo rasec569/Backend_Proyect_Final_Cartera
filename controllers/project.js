@@ -197,9 +197,9 @@ export const deleteProject = async (req, res) => {
     }
 
     // Cambiar el estado del proyecto
-    const project = await Project.findByIdAndUpdate(id, { estado }, { new: true });
+    const updatedproject = await Project.findByIdAndUpdate(id, { estado }, { new: true });
 
-    if (!project) {
+    if (!updatedproject) {
       return res.status(404).json({
         status: "error",
         message: "Proyecto no encontrado",
@@ -209,11 +209,11 @@ export const deleteProject = async (req, res) => {
     return res.json({
       status: "success",
       message: estado ? "Proyecto activado" : "Proyecto marcado como inactivo",
-      project: project,
+      project: updatedproject,
     });
   } catch (error) {
     console.error("Error al actualizar el estado del proyecto:", error);
-    res.status(500).json({
+    return res.status(500).json({
       status: "error",
       message: "Error al actualizar el estado del proyecto.",
       error: error.message,
