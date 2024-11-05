@@ -241,7 +241,7 @@ export const getContractsDueSoon = async (req, res) => {
     const contracts = await Contract.find().populate("pagos");
 
     const dueSoonContracts = contracts.filter(contract => {
-      const nextPaymentDate = /* lógica para calcular la próxima fecha de pago */;
+      //const nextPaymentDate = /* lógica para calcular la próxima fecha de pago */;
       return (nextPaymentDate - Date.now()) <= daysToDue * 86400000;
     });
 

@@ -24,13 +24,13 @@ router.get("/all/:page?", ensureAuth, getClients);
 router.get("/:id", ensureAuth, getClientById);
 
 // Obtener historial de pagos por cliente
-router.get("/pagos/:id", ensureAuth, getPaymentHistoryByClient);
+router.get("/pagos/:id", ensureAuth, getPaymentHistoryByClient);//Terminar y validar
 
 //Obtener pagos pendientes por cliente
-router.get("/pendientes/:id", ensureAuth, getPendingPaymentsByClient);
+router.get("/pendientes/:id", ensureAuth, getPendingPaymentsByClient);//Terminar y validar
 
 //Obtener clientes con contratos impagos o saldo vencido
-router.get("/vencido/:id", ensureAuth, getPendingPaymentsByClient);
+router.get("/vencido/:id", ensureAuth, getPendingPaymentsByClient);//Terminar y validar
 
 // Actualizar cliente por ID
 router.put("/:id", ensureAuth, updateClient);

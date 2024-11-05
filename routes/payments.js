@@ -21,7 +21,7 @@ router.get("/:id", ensureAuth, getPaymentById);
 // Obtener pago por ID del contrato
 router.get("/contrato/:id", ensureAuth, getPaymentsByContract);
 // Reporte de ingresos mensuales/anuales
-router.get("/reporte-ingresos?periodo=mensual", ensureAuth,);//GET /api/payments/reporte-ingresos?periodo=mensual o GET /api/payments/reporte-ingresos?periodo=anual
+router.get("/reporte-ingresos?periodo=mensual", ensureAuth,);//GET /api/payments/reporte-ingresos?periodo=mensual o GET /api/payments/reporte-ingresos?periodo=anual //Terminar y validar
 
 // Actualizar pago por ID
 router.put("/:id", ensureAuth, updatePayment);
