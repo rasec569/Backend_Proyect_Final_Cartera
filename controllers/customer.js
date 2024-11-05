@@ -251,6 +251,44 @@ export const getPendingPaymentsByClient = async (req, res) => {
     }
 };
 
+// Obtener clientes con contratos impagos o saldo vencido
+export const getClientsWithOverdueBalance = async (req, res) => {
+    try {
+        const clients = await Client.find().populate({
+            path: "contratos",
+            populate: {
+                path: "pagos"
+            }
+        });
+
+        const clientsWithOverdueBalance = clients.filter(client =>
+            client.contratos.some(contract => {
+                const totalPaid = contract.pagos.reduce((sum, payment) => sum + payment.monto, 0);
+                return contract.total > totalPaid; // Revisar saldo pendiente
+            })
+        );
+
+        if (!clientsWithOverdueBalance.length) {
+            return res.status(404).json({
+                status: "error",
+                message: "No hay clientes con saldo vencido",
+            });
+        }
+
+        return res.status(200).json({
+            status: "success",
+            clientsWithOverdueBalance,
+        });
+    } catch (error) {
+        console.error("Error al obtener clientes con saldo vencido:", error);
+        return res.status(500).json({
+            status: "error",
+            message: "Error al obtener clientes con saldo vencido",
+            error: error.message,
+        });
+    }
+};
+
 // Cambiar el estado de un cliente
 export const deleteClient = async (req, res) => {
     const { id } = req.params;
