@@ -7,6 +7,7 @@ import {
     updateClient,
     deleteClient, 
     getPaymentHistoryByClient,
+    getPendingPaymentsByClient,
     testCustomer
   } from "../controllers/customer.js";
 
@@ -26,8 +27,10 @@ router.get("/:id", ensureAuth, getClientById);
 router.get("/pagos/:id", ensureAuth, getPaymentHistoryByClient);
 
 //Obtener pagos pendientes por cliente
-router.get("/pendientes/:id", ensureAuth, getClientById);
+router.get("/pendientes/:id", ensureAuth, getPendingPaymentsByClient);
+
 //Obtener clientes con contratos impagos o saldo vencido
+router.get("/vencido/:id", ensureAuth, getPendingPaymentsByClient);
 
 // Actualizar cliente por ID
 router.put("/:id", ensureAuth, updateClient);
