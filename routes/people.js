@@ -24,6 +24,6 @@ router.get("/:id", ensureAuth, getPersonById);
 router.put("/:id", ensureAuth, updatePerson);
 
 // Eliminar persona por ID
-router.delete("/:id", ensureAuth, deletePerson);
+router.patch("/:id", ensureAuth, deletePerson);
 
 export default router;

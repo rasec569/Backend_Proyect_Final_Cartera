@@ -1,10 +1,10 @@
 import Person from "../models/people.js";
 
 // Metodo de prueba
-export const testPerson = (req, res) => { 
-  return res.status(200).send({ 
-      message: "Mensaje enviado desde el controlador de Personas" 
-  }); 
+export const testPerson = (req, res) => {
+  return res.status(200).send({
+    message: "Mensaje enviado desde el controlador de Personas"
+  });
 };
 
 // Crear persona
@@ -13,29 +13,29 @@ export const createPerson = async (req, res) => {
   //Obtener datos de la petición
   let person = req.body;
 
-  try {  
+  try {
     // Validación de campos requeridos para persona
     const requiredPersonFields = ['tip_doc', 'doc_identificacion', 'nombres', 'apellidos', 'telefono'];
     for (const field of requiredPersonFields) {
-        if (!person[field] || (field === 'doc_identificacion' && person[field] === '')) {
-            return res.status(400).send({
-                status: "error",
-                message: `El campo ${field} es requerido para la persona.`,
-            });
-        }
+      if (!person[field] || (field === 'doc_identificacion' && person[field] === '')) {
+        return res.status(400).send({
+          status: "error",
+          message: `El campo ${field} es requerido para la persona.`,
+        });
+      }
     }
 
     // Crear una nuevo objeto persona
-    let person_to_save= new Person(person);
+    let person_to_save = new Person(person);
 
     // Control de persona duplicada
     let existingPerson = await Person.findOne({ doc_identificacion: person.doc_identificacion });
 
     // Si la persona ya existe, retornar error
-    if(existingPerson){
+    if (existingPerson) {
       return res.status(409).send({
-        status:"error",
-        message:"La persona ya existe"
+        status: "error",
+        message: "La persona ya existe"
       });
     }
 
@@ -43,29 +43,29 @@ export const createPerson = async (req, res) => {
     await person_to_save.save();
 
     return res.status(201).json({
-      status:"created",
-      message:"Registro de persona exitoso",
+      status: "created",
+      message: "Registro de persona exitoso",
       person_to_save
     });
   } catch (error) {
     console.log("Error al crear la persona:", error);
     return res.status(500).send({
-      status:"error",
-      message:"Error en el registro de persona"
+      status: "error",
+      message: "Error en el registro de persona"
     });
   }
 };
 
 // Obtener todas las personas
 export const getPeople = async (req, res) => {
-   // Obtener la página desde los parámetros de la solicitud
-   let page=req.params.page? parseInt(req.params.page, 10) :1;
+  // Obtener la página desde los parámetros de la solicitud
+  let page = req.params.page ? parseInt(req.params.page, 10) : 1;
 
-   // Obtener el número de personas por página desde los parámetros de la solicitud
-   let itemsPorPage=req.params.limit? parseInt(req.params.limit, 10) :10;
-   
+  // Obtener el número de personas por página desde los parámetros de la solicitud
+  let itemsPorPage = req.params.limit ? parseInt(req.params.limit, 10) : 10;
+
   try {
-    const options={
+    const options = {
       page: page,
       limit: itemsPorPage,
       select: '-email -__v',
@@ -79,7 +79,7 @@ export const getPeople = async (req, res) => {
     const people = await Person.paginate({}, options);
 
     // Verificar si hay personas para mostrar
-    if (!people||people.docs.length===0){
+    if (!people || people.docs.length === 0) {
       return res.status(404).send({
         status: "error",
         message: "No hay personas para mostrar"
@@ -96,7 +96,7 @@ export const getPeople = async (req, res) => {
       currentPage: people.page,
       itemsPerPage: people.limit
     });
-    
+
   } catch (error) {
     console.log("Error al obtener las persona", error);
     return res.status(500).json({
@@ -175,7 +175,7 @@ export const updatePerson = async (req, res) => {
 
     // Verificar si la persona existe
     if (!updatedPerson) {
-      return res.status(404).send({ 
+      return res.status(404).send({
         status: "error",
         message: "Persona no encontrada",
       });
@@ -201,10 +201,28 @@ export const updatePerson = async (req, res) => {
 export const deletePerson = async (req, res) => {
 
   const personId = req.params.id;
+  let { estado } = req.body;
 
   try {
-    // Buscar la persona para verificar si existe antes de eliminarla
-    const person = await Person.findById(personId);
+    // Si 'estado' no se envía en el cuerpo, establecerlo en false
+    if (estado === undefined) {
+      estado = false;
+    } else {
+      // Convertir 'estado' a un valor booleano explícito
+      if (estado === 'true') estado = true;
+      else if (estado === 'false') estado = false;
+
+      // Validar que 'estado' sea un booleano
+      if (typeof estado !== 'boolean') {
+        return res.status(400).json({
+          status: "error",
+          message: "El estado debe ser un valor booleano (true o false)",
+        });
+      }
+    }
+
+    // Buscar y eliminar la persona
+    const person = await Person.findByIdAndUpdate(personId, { estado }, { new: true });
     if (!person) {
       return res.status(404).send({
         status: "error",
@@ -212,13 +230,11 @@ export const deletePerson = async (req, res) => {
       });
     }
 
-    // Eliminar la persona
-    await Person.findByIdAndDelete(personId);
-
     // Retornar mensaje de éxito
     return res.status(200).send({
       status: "success",
-      message: "Persona eliminada con éxito",
+      message: estado ? "Proyecto activado" : "Proyecto marcado como inactivo",
+      person: person,
     });
   } catch (error) {
     console.log("Error al eliminar la persona:", error);

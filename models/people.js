@@ -28,6 +28,11 @@ const PersonSchema =new Schema({
     },
     dirección:{
         type:String
+    },
+    estado: { 
+        type: Boolean, 
+        required: true,
+        default: true 
     }   
 });
 
