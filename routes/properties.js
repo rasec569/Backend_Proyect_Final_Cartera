@@ -1,4 +1,5 @@
 import { Router } from "express";
+import {ensureAuth} from "../middlewares/auth.js";
 import {
     createProperty,
     getProperties,
@@ -11,18 +12,18 @@ import {
 const router=Router();
 router.get("/test", tesProperty);
 // Crear una nueva propiedad
-router.post("/", createProperty);
+router.post("/registrar", ensureAuth, createProperty);
 
 // Obtener todas las propiedades
-router.get("/", getProperties);
+router.get("/all/:page?", ensureAuth, getProperties);
 
 // Obtener propiedad por ID
-router.get("/:id", getPropertyById);
+router.get("/:id", ensureAuth, getPropertyById);
 
 // Actualizar propiedad por ID
-router.put("/:id", updateProperty);
+router.put("/:id", ensureAuth, updateProperty);
 
 // Eliminar propiedad por ID
-router.delete("/:id", deleteProperty);
+router.patch("/:id", ensureAuth, deleteProperty);
 
 export default router;
