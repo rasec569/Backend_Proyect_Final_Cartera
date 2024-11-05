@@ -31,6 +31,8 @@ const initDatabase = async () => {
         await updateContracts();
         await updatePayments();
         await updateProperties();
+        await updatePersons(); 
+        await updatePropertyNames();
 
         // Cerrar la conexión
         await endconnection();
@@ -65,6 +67,39 @@ const updateProperties = async () => {
     );
     console.log(`Documentos de propiedad actualizados: ${propertyUpdateResult.modifiedCount}`);
 };
+const updatePersons = async () => {
+    const count = await Person.countDocuments(); // Contar documentos
+    console.log(`Total de documentos en la colección de personas: ${count}`);
+
+    // Obtener documentos para verificar su contenido
+    const persons = await Person.find({ estado: { $exists: false } });
+    console.log(`Documentos sin campo 'estado': ${JSON.stringify(persons, null, 2)}`);
+
+    const personUpdateResult = await Person.updateMany(
+        { estado: { $exists: false } },
+        { $set: { estado: true } }
+    );
+
+    if (personUpdateResult.modifiedCount !== undefined) {
+        console.log(`Documentos de persona actualizados: ${personUpdateResult.modifiedCount}`);
+    } else {
+        console.log("No se pudieron actualizar los documentos de persona.");
+    }
+};
+// Función para actualizar los nombres de las propiedades
+const updatePropertyNames = async () => {
+    const properties = await Property.find(); // Obtener todas las propiedades
+    let counter = 1; // Contador para nombres únicos
+
+    for (const property of properties) {
+        const newName = `Propiedad ${counter}`; // Crear un nuevo nombre
+        await Property.findByIdAndUpdate(property._id, { nombre: newName }); // Actualizar el documento
+        counter++; // Incrementar el contador
+    }
+
+    console.log(`Nombres de propiedades actualizados a: ${counter - 1}`);
+};
+
 
 // Ejecutar la función de inicialización
 initDatabase();
