@@ -20,7 +20,8 @@ const ProyectSchema=new Schema({
     },
     estado: { 
         type: Boolean, 
-        required: true 
+        required: true,
+        default: true 
     }
 });
 ProyectSchema.plugin(mongoosePaginate);

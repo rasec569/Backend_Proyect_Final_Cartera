@@ -5,16 +5,16 @@ import {
     getProjectById,
     updateProject,
     deleteProject,
-    tesProject
+    testProject
   } from "../controllers/project.js";
 
 const router=Router();
-router.get("/test", tesProject)
+router.get("/test", testProject)
 // Crear un nuevo proyecto
-router.post("/", createProject);
+router.post("/registrar", createProject);
 
 // Obtener todos los proyectos
-router.get("/", getProjects);
+router.get("/all/:page?", getProjects);
 
 // Obtener proyecto por ID
 router.get("/:id", getProjectById);
@@ -23,6 +23,6 @@ router.get("/:id", getProjectById);
 router.put("/:id", updateProject);
 
 // Eliminar proyecto por ID
-router.delete("/:id", deleteProject);
+router.patch("/:id", deleteProject);
 
 export default router;
