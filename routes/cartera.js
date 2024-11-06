@@ -1,8 +1,8 @@
 import express from "express";
-import { getCartera } from "../controllers/cartera.js";
+import { listCartera } from "../controllers/cartera.js";
 
 const router = express.Router();
 
-router.get("/", getCartera);
+router.get("/", listCartera);
 
 export default router;
